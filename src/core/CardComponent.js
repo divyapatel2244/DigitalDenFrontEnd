@@ -10,9 +10,12 @@ import React, { useState } from "react";
 import ImageHelper from "./helper/ImageHelper";
 import styled from "styled-components";
 import { addItemToCart, removeItemFromCart } from "./helper/cartHelper";
-import { Redirect,redirect } from "react-router-dom";
+import { Redirect,redirect,useHistory } from "react-router-dom";
 import { GetProduct } from "./helper/coreapicalls";
 import ProductDetail from "./ProductDetail";
+import Cart from './helper/Cart';
+// import { useHistory } from "react-router";
+
 
 const CardComponent = ({
   product,
@@ -23,12 +26,12 @@ const CardComponent = ({
 }) => {
   const [redirect, setRedirect] = useState(false);
   const [count, setCount] = useState(product.count);
-  
+  const history = useHistory();
   const cardTitle = product ? product.productName : "Default Tshirt";
   console.log(product);
   const cardDescription = product ? product.productDescription : "Default Description";
   const cardPrice = product ? product.price : "Default price";
-  
+  const [flag,setFlag]=useState(false);
 
   const addtoCart = () => {
     return addItemToCart(product, () => {
@@ -38,7 +41,7 @@ const CardComponent = ({
 
   const getARedirect = (redirect) => {
     if (redirect) {
-      return <Redirect to="/cart" />;
+      return <Cart id={3}/>;
     }
   };
 
@@ -59,7 +62,7 @@ const CardComponent = ({
           size="small"
           color="secondary"
           onClick={() => {
-            removeItemFromCart(product._id);
+            removeItemFromCart(product.id);
             setReload(!reload);
           }}
         >
@@ -69,10 +72,12 @@ const CardComponent = ({
     );
   };
 
+
   return (
     <CardMain>
       <Card>
-        <CardActionArea onClick={()=><Redirect to="/product/:id" />}>
+        <Button onClick={()=>history.push(`/product/${product.id}`)}>
+        <CardActionArea>
           <ImageHelper productId={product.id} imageUrl={product.imageUrl} />
           <CardContent>
             <Typography gutterBottom variant="h6" component="h2">
@@ -86,6 +91,7 @@ const CardComponent = ({
             </Typography>
           </CardContent>
         </CardActionArea>
+        </Button>
         <CardActions>
           {showAddToCart(addToCart)}
           {showRemoveFromCart(removeFromCart)}

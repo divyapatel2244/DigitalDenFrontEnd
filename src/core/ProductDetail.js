@@ -1,43 +1,60 @@
 import ReactDOM from 'react-dom';
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+import "react-responsive-carousel/lib/styles/carousel.min.css"; 
 import { Carousel } from 'react-responsive-carousel';
 import { Button } from '@mui/material';
 import  RatingReview  from './RatingReview';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { API } from '../backend';
+import CircularProgress from '@mui/material/CircularProgress';
+import Complaints from './helper/Complaints';
 
 function ProductDetail(){
-    
+    const [id,setId]=useState(0);
     const [product,setProduct]=useState(null);
-    useEffect(() => {
+    useEffect(async() => {
         console.log(window.location.href.split("/").slice(-1).at(0));
-      axios.get(`${API}/product/${window.location.href.split("/").slice(-1).at(0)}`,{method:"GET"})
+        console.log(`${ API } /products/${ window.location.href.split("/").slice(-1).at(0) }`);
+        await axios.get(`${API}/products/${window.location.href.split("/").slice(-1).at(0)}`,{method:"GET"})
       .then(response=>{
-           console.log(response); 
-      }).catch(err=>{console.log(err)})
+           setProduct(response.data);
+        //    console.log(product); 
+      }).catch(err=>{console.log(err)});
+       
+        await axios.get(`${API}/rating/fetchId`, {params:{
+            customerId: 4,
+            productId: window.location.href.split("/").slice(-1).at(0)
+        }
+        }).then((response) => {
+            setId(response.data);
+        })
+            .catch(err => console.log(err));
     },[])
-    
+
+    if(product==null){
+        return <CircularProgress />
+    }
     return (
+        
         <div>
             <div>
         <Carousel>
             <div>
-                <img src="https://firebasestorage.googleapis.com/v0/b/digitalden-20146.appspot.com/o/images%20Of%20Products%2Fiphone-13-pro-review-dan-baker-35.jpg?alt=media&token=086cc001-e285-4db5-a167-6faf5b97dac6" alt='images'/>
+                        <img src={product.imageUrl} alt='images'/>
             </div>
             <div>
-                <img src="https://firebasestorage.googleapis.com/v0/b/digitalden-20146.appspot.com/o/images%20Of%20Products%2Fiphone-13-pro-review-dan-baker-35.jpg?alt=media&token=086cc001-e285-4db5-a167-6faf5b97dac6" alt='images'></img>
+                        <img src={product.imageUrl} alt='images'></img>
             </div>
             <div>
-                <img src="https://firebasestorage.googleapis.com/v0/b/digitalden-20146.appspot.com/o/images%20Of%20Products%2Fiphone-13-pro-review-dan-baker-35.jpg?alt=media&token=086cc001-e285-4db5-a167-6faf5b97dac6" alt='images'/>
+                        <img src={product.imageUrl} alt='images'/>
             </div>
         </Carousel>
             </div>
             <div>
-                <h1>Iphone 13 pro</h1>
-                <h2>Price:2345678</h2>
-                <h3>Category:-crybrgirnmfenmjtbgtnifemdormgi</h3>
-                <h3>Company name:apple</h3>
+                <h1>{product.productName}</h1>
+                <h2>Price:{product.price}</h2>
+                <h3>Category:-{product.category}</h3>
+                <h3>Company name:{product.companyName}</h3>
                 <Button>Add to cart</Button>
                 <Button>Buy</Button>
             </div>
@@ -56,7 +73,11 @@ function ProductDetail(){
                 Supports MagSafe accessories for easy attachment and faster wireless charging
             </div>
             <div>
-                <RatingReview/>
+                <RatingReview id={id}/>
+            </div>
+            <div>
+                <h1>Complaints</h1>
+                <Complaints/>
             </div>
         </div>
         
