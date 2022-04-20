@@ -1,11 +1,12 @@
 import './App.css';
-import SignIn from './SignIn.js';
+import SignIn from './user/SignIn.js';
  import Product from './Products.js';
  import axios from 'axios';
 import Home from './core/Home.js';
 // import { BrowserRouter, Switch, Route } from "react-router-dom";
 import { Route, Switch, BrowserRouter } from "react-router-dom";
 import ProductDetail from './core/ProductDetail';
+import Signup from './user/Signup';
 
 
 
@@ -35,6 +36,9 @@ function App() {
 
             <Route exact path="/product/:id">
               <ProductDetail></ProductDetail>
+            </Route>
+            <Route exact path="/signup">
+              <Signup></Signup>
             </Route>
           </Switch>
         </BrowserRouter>

@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useState } from "react";
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -12,6 +12,9 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { signin } from './helper/signinHelper';
+import { useHistory } from 'react-router-dom';
+import Base from "../core/Base";
 
 function Copyright(props) {
     return (
@@ -29,16 +32,53 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignIn() {
+    
+    let history = useHistory();
+
+    const [values, setValues] = useState({
+        email: "",
+        password: "",
+        error: "",
+        success: false,
+      });
+    
+      // Destucturing of values
+      const { email, password, error } = values;
+
+      const handleChange = (name) => (event) => {
+        setValues({
+          ...values,
+          error: false,
+          [name]: event.target.value,
+        });
+      };
+    
     const handleSubmit = (event) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
-        console.log({
-            email: data.get('email'),
-            password: data.get('password'),
-        });
+        signin({
+            userName: email,
+            password
+          })
+            .then((data) => {
+                console.log(data);
+              if (data.error) {
+                setValues({ ...values, error: data.error, success: false });
+              } else {
+                  localStorage.setItem("Customer", JSON.stringify( data.data));
+                setValues({
+                  ...values,  
+                  email: "",
+                  password: "",
+                  error: "",
+                  success: false,
+                });
+                history.push("/");
+              }
+            })
     };
 
     return (
+        <Base>
         <ThemeProvider theme={theme}>
             <Container component="main" maxWidth="xs">
                 <CssBaseline />
@@ -50,11 +90,11 @@ export default function SignIn() {
                         alignItems: 'center',
                     }}
                 >
-                    <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-                        <LockOutlinedIcon />
+                    <Avatar sx={{ width: 500, height: 100 }}>
+                        <img src="https://firebasestorage.googleapis.com/v0/b/myphotobook-f86ff.appspot.com/o/Image%2FDigital%20Den%20(1).png?alt=media&token=b3c250cc-eb26-4b5a-b18a-f70726a8edca" alt="Logo" />
                     </Avatar>
-                    <Typography component="h1" variant="h5">
-                        Sign in
+                    <Typography component="h1" variant="h4" sx={{mt: 3}} >
+                        SIGN IN
                     </Typography>
                     <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
                         <TextField
@@ -66,6 +106,8 @@ export default function SignIn() {
                             name="email"
                             autoComplete="email"
                             autoFocus
+                            value={email}
+                            onChange={handleChange("email")}
                         />
                         <TextField
                             margin="normal"
@@ -76,6 +118,8 @@ export default function SignIn() {
                             type="password"
                             id="password"
                             autoComplete="current-password"
+                            value={password}
+                            onChange={handleChange("password")}
                         />
                         <FormControlLabel
                             control={<Checkbox value="remember" color="primary" />}
@@ -96,7 +140,7 @@ export default function SignIn() {
                                 </Link>
                             </Grid>
                             <Grid item>
-                                <Link href="#" variant="body2">
+                                <Link href="/signup" variant="body2">
                                     {"Don't have an account? Sign Up"}
                                 </Link>
                             </Grid>
@@ -106,5 +150,6 @@ export default function SignIn() {
                 <Copyright sx={{ mt: 8, mb: 4 }} />
             </Container>
         </ThemeProvider>
+        </Base>
     );
 }

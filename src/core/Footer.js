@@ -12,7 +12,7 @@ const Footer = () => {
   return (
     <FooterMain>
       <Container>
-        <Brand>TShirtsFarm</Brand>
+        <Brand>DIGITAL DEN</Brand>
         <Grid container>
           <Grid item xs={12} sm={4}>
             <FooterTitle>Customer Service</FooterTitle>
